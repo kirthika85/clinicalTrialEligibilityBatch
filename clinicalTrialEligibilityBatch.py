@@ -185,7 +185,7 @@ if len(uploaded_files) >= 2 and openai_api_key:
                     'NCT Number': nct_id,
                     'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
                     'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
-                    'Inclusion Eligibility Score': inclusion_score,
+                    'Eligibility Score': inclusion_score,
                     'Number of Inclusion Criteria Matches': inclusion_score_numerator
                 })
             else:
