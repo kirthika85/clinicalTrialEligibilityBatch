@@ -232,7 +232,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
        st.write("Checking eligibility...")
     
         # Read CSV file from current directory
-        try:
+       try:
             csv_df = pd.read_csv('Clinical_Trails_output.csv')
             st.write("### Eligibility Results:")
             st.dataframe(csv_df)
@@ -243,9 +243,9 @@ if len(uploaded_files) >= 3 and openai_api_key:
                 file_name='eligibility_results.csv',
                 mime='text/csv',
             )
-        except FileNotFoundError:
+       except FileNotFoundError:
             st.error("The file 'Clinical_Trails_output.csv' was not found in the current directory.")
-        except Exception as e:
+       except Exception as e:
             st.error(f"Error reading CSV file: {str(e)}")
         
 
