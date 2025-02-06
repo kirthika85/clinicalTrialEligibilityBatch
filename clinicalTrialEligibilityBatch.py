@@ -169,7 +169,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
         eligibility_table = []
         for nct_id in nct_numbers:
             selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
-            st.write("Eligibility for {nct_id}:")
+            #st.write("Eligibility for {nct_id}:")
                 
             # Fetch and parse criteria for selected trial
             criteria_text = fetch_trial_criteria(nct_id)
