@@ -166,7 +166,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
     patient_names = patient_df['Patient Name'].tolist()
     
     # Create dropdowns
-    selected_patient = st.selectbox("Select Patient Name", patient_names)
+    #selected_patient = st.selectbox("Select Patient Name", patient_names)
     
     # Initialize LLM
     llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-4", temperature=0.1)
@@ -177,48 +177,50 @@ if len(uploaded_files) >= 3 and openai_api_key:
         
         # Iterate over all NCT numbers
         eligibility_table = []
-        for nct_id in nct_numbers:
-            selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
-            st.write(f"Eligibility for {nct_id}:")
+        for patient_name in patient_df['Patient Name'].tolist():
+            selected_patient_row = patient_df[patient_df['Patient Name'] == patient_name].iloc[0]
+            for nct_id in nct_numbers:
+                #selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
+                st.write(f"Eligibility for {patient_name} in {nct_id}:")
                 
-            # Fetch and parse criteria for selected trial
-            criteria_text = fetch_trial_criteria(nct_id)
-            if criteria_text:
-               parsed_criteria = parse_criteria(llm, criteria_text)
-                    
-               # Calculate inclusion eligibility score
-               inclusion_score_numerator = 0
-               inclusion_criteria_count = 0
-               criterion_number = 1
-               for i, criterion in enumerate(parsed_criteria['inclusion'], start=1):
-                  if criterion.strip().lower().startswith("registration #"):
-                      continue
-                  eligibility = correlate_patient_with_trial(llm, selected_patient_row, criterion)
-                  criterion_number += 1
-                  if eligibility == "Yes":
-                       inclusion_score_numerator += 1
-                  inclusion_criteria_count += 1
-                    
-               if inclusion_criteria_count > 0:
-                  inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
-               else:
-                  inclusion_score = 0
-
-               if inclusion_score > 0:
-               # Add to eligibility table
-                   eligibility_table.append({
-                       'Patient Name': selected_patient,
-                       'Patient ID': selected_patient_row['Patient ID'],
-                       'NCT Number': nct_id,
-                       'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
-                       'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
-                       'Eligibility Score': inclusion_score,
-                       'Number of Inclusion Criteria Matches': inclusion_score_numerator
-                    })
-               else:
-                   st.write(f"{nct_id} has zero eligibility score.")
-            else:
-                 st.error(f"No eligibility criteria found for {nct_id}.")
+                # Fetch and parse criteria for selected trial
+                criteria_text = fetch_trial_criteria(nct_id)
+                if criteria_text:
+                   parsed_criteria = parse_criteria(llm, criteria_text)
+                        
+                   # Calculate inclusion eligibility score
+                   inclusion_score_numerator = 0
+                   inclusion_criteria_count = 0
+                   criterion_number = 1
+                   for i, criterion in enumerate(parsed_criteria['inclusion'], start=1):
+                      if criterion.strip().lower().startswith("registration #"):
+                          continue
+                      eligibility = correlate_patient_with_trial(llm, selected_patient_row, criterion)
+                      criterion_number += 1
+                      if eligibility == "Yes":
+                           inclusion_score_numerator += 1
+                      inclusion_criteria_count += 1
+                        
+                   if inclusion_criteria_count > 0:
+                      inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
+                   else:
+                      inclusion_score = 0
+    
+                   if inclusion_score > 0:
+                   # Add to eligibility table
+                       eligibility_table.append({
+                           'Patient Name': selected_patient,
+                           'Patient ID': selected_patient_row['Patient ID'],
+                           'NCT Number': nct_id,
+                           'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
+                           'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
+                           'Eligibility Score': inclusion_score,
+                           'Number of Inclusion Criteria Matches': inclusion_score_numerator
+                        })
+                   else:
+                       st.write(f"{nct_id} has zero eligibility score.")
+                else:
+                     st.error(f"No eligibility criteria found for {nct_id}.")
            
                 
         # Display eligibility table
