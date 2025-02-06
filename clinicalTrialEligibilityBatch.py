@@ -168,18 +168,18 @@ if len(uploaded_files) >= 3 and openai_api_key:
                inclusion_criteria_count = 0
                criterion_number = 1
                for i, criterion in enumerate(parsed_criteria['inclusion'], start=1):
-                   if criterion.strip().lower().startswith("registration #"):
+                  if criterion.strip().lower().startswith("registration #"):
                       continue
-                    eligibility = correlate_patient_with_trial(llm, selected_patient_row, criterion)
-                    criterion_number += 1
-                    if eligibility == "Yes":
+                  eligibility = correlate_patient_with_trial(llm, selected_patient_row, criterion)
+                  criterion_number += 1
+                  if eligibility == "Yes":
                        inclusion_score_numerator += 1
-                       inclusion_criteria_count += 1
+                  inclusion_criteria_count += 1
                     
-                    if inclusion_criteria_count > 0:
-                       inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
-                    else:
-                        inclusion_score = 0
+               if inclusion_criteria_count > 0:
+                  inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
+               else:
+                  inclusion_score = 0
                     
                # Add to eligibility table
                eligibility_table.append({
