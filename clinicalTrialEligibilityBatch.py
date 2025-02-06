@@ -156,7 +156,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
         eligibility_table = []
         for nct_id in nct_numbers:
             selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
-            st.write(f"### Eligibility for {nct_id}:")
+            st.write("Eligibility for {nct_id}:")
                 
             # Fetch and parse criteria for selected trial
             criteria_text = fetch_trial_criteria(nct_id)
@@ -193,7 +193,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
                        'Number of Inclusion Criteria Matches': inclusion_score_numerator
                     })
                else:
-                   st.write(f"Skipping {nct_id} due to zero eligibility score.")
+                   st.write({nct_id} has zero eligibility score.")
             else:
                  st.error(f"No eligibility criteria found for {nct_id}.")
            
