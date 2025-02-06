@@ -39,8 +39,8 @@ def prompt_llm_for_icd_codes(llm, study_title):
         return None
 
 # Function to validate ICD code mapping
-def validate_icd_mapping(llm, nct_id, patient_row):
-    study_title = fetch_study_details(nct_id)
+def validate_icd_mapping(llm, nct_id, patient_row, trial_df):
+    study_title = trial_df.loc[trial_df['NCT Number'] == nct_id, 'Study Title'].iloc[0]
     if study_title:
         icd_prefix = prompt_llm_for_icd_codes(llm, study_title)
         if icd_prefix:
@@ -201,7 +201,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
         eligibility_table = []
         for nct_id in nct_numbers:
             selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
-            if validate_icd_mapping(llm, nct_id, selected_patient_row):
+            if validate_icd_mapping(llm, nct_id, selected_patient_row,trial_df):
                 st.write(f"### Eligibility for {nct_id}:")
                 
                 # Fetch and parse criteria for selected trial
