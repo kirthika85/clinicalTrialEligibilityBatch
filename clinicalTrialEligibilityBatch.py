@@ -229,7 +229,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
    #     st.write("### Eligibility Summary:")
    #     st.dataframe(eligibility_df)
       # Button to check eligibility
-      if st.button("Check Eligibility"):
+     if st.button("Check Eligibility"):
          st.write("Checking eligibility...")
     
          # Read CSV file from current directory
