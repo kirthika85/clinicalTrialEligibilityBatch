@@ -200,6 +200,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
         # Iterate over all NCT numbers
         eligibility_table = []
         for nct_id in nct_numbers:
+            selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
             if validate_icd_mapping(llm, nct_id, selected_patient_row):
                 st.write(f"### Eligibility for {nct_id}:")
                 
@@ -209,7 +210,6 @@ if len(uploaded_files) >= 3 and openai_api_key:
                     parsed_criteria = parse_criteria(llm, criteria_text)
                     
                     # Calculate inclusion eligibility score
-                    selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
                     inclusion_score_numerator = 0
                     inclusion_criteria_count = 0
                     criterion_number = 1
