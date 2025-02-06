@@ -31,6 +31,7 @@ def prompt_llm_for_icd_codes(llm, study_title):
         if icd_codes:
             first_icd_code = icd_codes[0]
             first_three_letters = first_icd_code[:3]
+            st.write(f"**First Three Letters of First ICD Code:** {first_three_letters}")
             return first_three_letters
         else:
             return None
