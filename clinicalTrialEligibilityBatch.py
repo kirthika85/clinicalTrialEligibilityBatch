@@ -13,6 +13,51 @@ def validate_nct_id(nct_id):
         nct_id[3:].isdigit()
     )
 
+#Function to prompt LLM for ICD codes
+def prompt_llm_for_icd_codes(llm, study_title):
+    prompt = f"""
+    Identify relevant ICD codes for the following clinical trial study title:
+
+    **Study Title:**
+    {study_title}
+
+    List the ICD codes that are most relevant to this study.
+    """
+    try:
+        result = llm.invoke(prompt).content
+        icd_codes = result.strip('` \n').splitlines()
+        
+        # Extract the first ICD code and its first three letters
+        if icd_codes:
+            first_icd_code = icd_codes[0]
+            first_three_letters = first_icd_code[:3]
+            return first_three_letters
+        else:
+            return None
+    except Exception as e:
+        st.error(f"Error prompting LLM: {str(e)}")
+        return None
+
+# Function to validate ICD code mapping
+def validate_icd_mapping(llm, nct_id, patient_row):
+    study_title = fetch_study_details(nct_id)
+    if study_title:
+        icd_prefix = prompt_llm_for_icd_codes(llm, study_title)
+        if icd_prefix:
+            primary_diagnosis = patient_row['Primary Diagnosis']
+            secondary_diagnosis = patient_row['Secondary Diagnosis']
+            
+            # Check if either diagnosis matches the ICD prefix
+            if primary_diagnosis.startswith(icd_prefix) or secondary_diagnosis.startswith(icd_prefix):
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+
 # Function to fetch trial criteria from ClinicalTrials.gov API
 def fetch_trial_criteria(nct_id):
     api_url = f"https://clinicaltrials.gov/api/v2/studies/{nct_id}"
@@ -155,45 +200,48 @@ if len(uploaded_files) >= 3 and openai_api_key:
         # Iterate over all NCT numbers
         eligibility_table = []
         for nct_id in nct_numbers:
-            st.write(f"### Eligibility for {nct_id}:")
-            
-            # Fetch and parse criteria for selected trial
-            criteria_text = fetch_trial_criteria(nct_id)
-            if criteria_text:
-                parsed_criteria = parse_criteria(llm, criteria_text)
+            if validate_icd_mapping(llm, nct_id, selected_patient_row):
+                st.write(f"### Eligibility for {nct_id}:")
                 
-                # Calculate inclusion eligibility score
-                selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
-                inclusion_score_numerator = 0
-                inclusion_criteria_count = 0
-                criterion_number = 1
-                for i, criterion in enumerate(parsed_criteria['inclusion'], start=1):
-                    if criterion.strip().lower().startswith("registration #"):
-                        continue
-                    eligibility = correlate_patient_with_trial(llm, selected_patient_row, criterion)
-                    criterion_number += 1
-                    if eligibility == "Yes":
-                        inclusion_score_numerator += 1
-                    inclusion_criteria_count += 1
-                
-                if inclusion_criteria_count > 0:
-                   inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
+                # Fetch and parse criteria for selected trial
+                criteria_text = fetch_trial_criteria(nct_id)
+                if criteria_text:
+                    parsed_criteria = parse_criteria(llm, criteria_text)
+                    
+                    # Calculate inclusion eligibility score
+                    selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
+                    inclusion_score_numerator = 0
+                    inclusion_criteria_count = 0
+                    criterion_number = 1
+                    for i, criterion in enumerate(parsed_criteria['inclusion'], start=1):
+                        if criterion.strip().lower().startswith("registration #"):
+                            continue
+                        eligibility = correlate_patient_with_trial(llm, selected_patient_row, criterion)
+                        criterion_number += 1
+                        if eligibility == "Yes":
+                            inclusion_score_numerator += 1
+                        inclusion_criteria_count += 1
+                    
+                    if inclusion_criteria_count > 0:
+                       inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
+                    else:
+                        inclusion_score = 0
+                    
+                    # Add to eligibility table
+                    eligibility_table.append({
+                        'Patient Name': selected_patient,
+                        'Patient ID': selected_patient_row['Patient ID'],
+                        'NCT Number': nct_id,
+                        'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
+                        'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
+                        'Eligibility Score': inclusion_score,
+                        'Number of Inclusion Criteria Matches': inclusion_score_numerator
+                    })
                 else:
-                    inclusion_score = 0
-                
-                # Add to eligibility table
-                eligibility_table.append({
-                    'Patient Name': selected_patient,
-                    'Patient ID': selected_patient_row['Patient ID'],
-                    'NCT Number': nct_id,
-                    'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
-                    'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
-                    'Eligibility Score': inclusion_score,
-                    'Number of Inclusion Criteria Matches': inclusion_score_numerator
-                })
+                    st.error(f"No eligibility criteria found for {nct_id}.")
             else:
-                st.error(f"No eligibility criteria found for {nct_id}.")
-        
+                st.write(f"Skipping {nct_id} due to invalid ICD mapping.")
+                
         # Display eligibility table
         eligibility_df = pd.DataFrame(eligibility_table)
         st.write("### Eligibility Summary:")
