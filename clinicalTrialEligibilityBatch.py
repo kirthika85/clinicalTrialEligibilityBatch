@@ -173,7 +173,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
 #    llm = ChatOpenAI(openai_api_key=openai_api_key, model="gpt-4", temperature=0.1)
     
     # Button to check eligibility
-    if st.button("Check Eligibility"):
+    #if st.button("Check Eligibility"):
  #       st.write("Checking eligibility...")
         
         # Iterate over all NCT numbers
@@ -228,7 +228,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
    #     eligibility_df = pd.DataFrame(eligibility_table)
    #     st.write("### Eligibility Summary:")
    #     st.dataframe(eligibility_df)
-  
+   if st.button("Check Eligibility"):
        st.write("Checking eligibility...")
     
         # Read CSV file from current directory
