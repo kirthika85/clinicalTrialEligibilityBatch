@@ -151,15 +151,15 @@ st.success("✅ Mool AI agent Authentication Successful")
 uploaded_files = st.file_uploader("Upload files", type=["xlsx", "xls", "csv"], accept_multiple_files=True)
 
 
-#if len(uploaded_files) >= 3 and openai_api_key:
-#    clinical_trial_file = uploaded_files[0]
-#    patient_database_file = uploaded_files[1]
-#    icd_codes_file = uploaded_files[2]
+if len(uploaded_files) >= 3 and openai_api_key:
+   clinical_trial_file = uploaded_files[0]
+   patient_database_file = uploaded_files[1]
+   icd_codes_file = uploaded_files[2]
     
-    # Load data
-#    trial_df = pd.read_excel(clinical_trial_file, engine='openpyxl', dtype=str)
-#    patient_df = pd.read_excel(patient_database_file, engine='openpyxl', dtype=str)
-#    icd_codes_df = pd.read_excel(icd_codes_file, engine='openpyxl', dtype=str)
+   # Load data
+   trial_df = pd.read_excel(clinical_trial_file, engine='openpyxl', dtype=str)
+   patient_df = pd.read_excel(patient_database_file, engine='openpyxl', dtype=str)
+   icd_codes_df = pd.read_excel(icd_codes_file, engine='openpyxl', dtype=str)
     
 #    icd_dict = dict(zip(icd_codes_df['ICD Code'], icd_codes_df['Disease Name']))
     # Extract NCT numbers and patient names
@@ -228,4 +228,25 @@ uploaded_files = st.file_uploader("Upload files", type=["xlsx", "xls", "csv"], a
    #     eligibility_df = pd.DataFrame(eligibility_table)
    #     st.write("### Eligibility Summary:")
    #     st.dataframe(eligibility_df)
+      # Button to check eligibility
+      if st.button("Check Eligibility"):
+         st.write("Checking eligibility...")
+    
+         # Read CSV file from current directory
+        try:
+            csv_df = pd.read_csv('Clinical_Trails_output.csv')
+            st.write("### Eligibility Results:")
+            st.dataframe(csv_df)
+        
+            st.download_button(
+                label="Download Eligibility Results as CSV",
+                data=csv,
+                file_name='eligibility_results.csv',
+                mime='text/csv',
+            )
+        except FileNotFoundError:
+            st.error("The file 'Clinical_Trails_output.csv' was not found in the current directory.")
+        except Exception as e:
+            st.error(f"Error reading CSV file: {str(e)}")
+        
 
