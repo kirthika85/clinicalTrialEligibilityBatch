@@ -180,17 +180,20 @@ if len(uploaded_files) >= 3 and openai_api_key:
                   inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
                else:
                   inclusion_score = 0
-                    
+
+               if inclusion_score > 0:
                # Add to eligibility table
-               eligibility_table.append({
-                   'Patient Name': selected_patient,
-                   'Patient ID': selected_patient_row['Patient ID'],
-                   'NCT Number': nct_id,
-                   'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
-                   'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
-                   'Eligibility Score': inclusion_score,
-                   'Number of Inclusion Criteria Matches': inclusion_score_numerator
-                })
+                   eligibility_table.append({
+                       'Patient Name': selected_patient,
+                       'Patient ID': selected_patient_row['Patient ID'],
+                       'NCT Number': nct_id,
+                       'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
+                       'Secondary Diagnosis': selected_patient_row['Secondary Diagnosis'],
+                       'Eligibility Score': inclusion_score,
+                       'Number of Inclusion Criteria Matches': inclusion_score_numerator
+                    })
+               else:
+                   st.write(f"Skipping {nct_id} due to zero eligibility score.")
             else:
                  st.error(f"No eligibility criteria found for {nct_id}.")
            
