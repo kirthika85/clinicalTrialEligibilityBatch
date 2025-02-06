@@ -150,6 +150,7 @@ st.success("✅ Mool AI agent Authentication Successful")
 # Load files
 uploaded_files = st.file_uploader("Upload files", type=["xlsx", "xls", "csv"], accept_multiple_files=True)
 
+"""
 if len(uploaded_files) >= 3 and openai_api_key:
     clinical_trial_file = uploaded_files[0]
     patient_database_file = uploaded_files[1]
@@ -227,16 +228,5 @@ if len(uploaded_files) >= 3 and openai_api_key:
         eligibility_df = pd.DataFrame(eligibility_table)
         st.write("### Eligibility Summary:")
         st.dataframe(eligibility_df)
+"""
 
-        @st.cache
-        def convert_df(eligibility_df):
-            return eligibility_df.to_csv(index=False).encode('utf-8')
-
-        csv = convert_df(eligibility_df)
-
-        st.download_button(
-            label="Download Eligibility Table as CSV",
-            data=csv,
-            file_name='eligibility_table.csv',
-            mime='text/csv',
-        )
