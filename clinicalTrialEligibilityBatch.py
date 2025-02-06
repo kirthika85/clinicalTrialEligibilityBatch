@@ -237,12 +237,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
             st.write("### Eligibility Results:")
             st.dataframe(csv_df)
         
-            st.download_button(
-                label="Download Eligibility Results as CSV",
-                data=csv,
-                file_name='eligibility_results.csv',
-                mime='text/csv',
-            )
+
        except FileNotFoundError:
             st.error("The file 'Clinical_Trails_output.csv' was not found in the current directory.")
        except Exception as e:
