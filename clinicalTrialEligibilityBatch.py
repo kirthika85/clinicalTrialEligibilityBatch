@@ -87,8 +87,8 @@ def correlate_patient_with_trial(llm, patient_row, criterion):
     
     # Prepare patient information
     patient_info = {
-        'primary_diagnosis': patient_row['Primary Diagnosis'],
-        'secondary_diagnosis': patient_row['Secondary Diagnosis'],
+        'primary_diagnosis': icd_dict.get(patient_row['Primary Diagnosis'], 'Unknown'),
+        'secondary_diagnosis': icd_dict.get(patient_row['Secondary Diagnosis'], 'Unknown'),
         'prescription': patient_row['Prescription'],
         'jcode': patient_row['JCode']
     }
@@ -127,14 +127,17 @@ with st.sidebar:
 # Load files
 uploaded_files = st.file_uploader("Upload files", type=["xlsx", "xls", "csv"], accept_multiple_files=True)
 
-if len(uploaded_files) >= 2 and openai_api_key:
+if len(uploaded_files) >= 3 and openai_api_key:
     clinical_trial_file = uploaded_files[0]
     patient_database_file = uploaded_files[1]
+    icd_codes_file = uploaded_files[2]
     
     # Load data
     trial_df = pd.read_excel(clinical_trial_file, engine='openpyxl', dtype=str)
     patient_df = pd.read_excel(patient_database_file, engine='openpyxl', dtype=str)
+    icd_codes_df = pd.read_excel(icd_codes_file, engine='openpyxl', dtype=str)
     
+    icd_dict = dict(zip(icd_codes_df['ICD Code'], icd_codes_df['Disease Name']))
     # Extract NCT numbers and patient names
     nct_numbers = trial_df['NCT Number'].tolist()
     patient_names = patient_df['Patient Name'].tolist()
