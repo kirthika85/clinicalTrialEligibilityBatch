@@ -209,7 +209,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
                    if inclusion_score > 0:
                    # Add to eligibility table
                        eligibility_table.append({
-                           'Patient Name': selected_patient,
+                           'Patient Name': patient_name,
                            'Patient ID': selected_patient_row['Patient ID'],
                            'NCT Number': nct_id,
                            'Primary Diagnosis': selected_patient_row['Primary Diagnosis'],
@@ -227,3 +227,16 @@ if len(uploaded_files) >= 3 and openai_api_key:
         eligibility_df = pd.DataFrame(eligibility_table)
         st.write("### Eligibility Summary:")
         st.dataframe(eligibility_df)
+
+        @st.cache
+        def convert_df(eligibility_df):
+            return eligibility_df.to_csv(index=False).encode('utf-8')
+
+        csv = convert_df(eligibility_df)
+
+        st.download_button(
+            label="Download Eligibility Table as CSV",
+            data=csv,
+            file_name='eligibility_table.csv',
+            mime='text/csv',
+        )
