@@ -229,10 +229,10 @@ if len(uploaded_files) >= 3 and openai_api_key:
    #     st.write("### Eligibility Summary:")
    #     st.dataframe(eligibility_df)
       # Button to check eligibility
-     if st.button("Check Eligibility"):
-         st.write("Checking eligibility...")
+    if st.button("Check Eligibility"):
+       st.write("Checking eligibility...")
     
-         # Read CSV file from current directory
+        # Read CSV file from current directory
         try:
             csv_df = pd.read_csv('Clinical_Trails_output.csv')
             st.write("### Eligibility Results:")
