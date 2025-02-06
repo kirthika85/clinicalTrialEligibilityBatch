@@ -3,6 +3,8 @@ import pandas as pd
 import requests
 import json
 from langchain.chat_models import ChatOpenAI
+import os
+import time
 
 # Function to validate NCT ID format
 def validate_nct_id(nct_id):
@@ -134,8 +136,16 @@ with col2:
     )
 
 # Sidebar for OpenAI API Key
-with st.sidebar:
-    openai_api_key = st.text_input("Enter OpenAI API Key")
+#with st.sidebar:
+#    openai_api_key = st.text_input("Enter OpenAI API Key")
+with st.spinner("🔄 Mool AI agent Authentication In progress..."):
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    if not openai_api_key:
+        st.error("❌ API_KEY not found in environment variables.")
+        st.stop()
+    time.sleep(5)
+st.success("✅ Mool AI agent Authentication Successful")
+
 
 # Load files
 uploaded_files = st.file_uploader("Upload files", type=["xlsx", "xls", "csv"], accept_multiple_files=True)
