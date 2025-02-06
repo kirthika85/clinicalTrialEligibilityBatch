@@ -206,7 +206,7 @@ if len(uploaded_files) >= 3 and openai_api_key:
                        'Number of Inclusion Criteria Matches': inclusion_score_numerator
                     })
                else:
-                   st.write({nct_id} has zero eligibility score.")
+                   st.write("{nct_id} has zero eligibility score.")
             else:
                  st.error(f"No eligibility criteria found for {nct_id}.")
            
