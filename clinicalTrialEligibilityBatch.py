@@ -162,6 +162,7 @@ if len(uploaded_files) >= 2 and openai_api_key:
                 # Calculate inclusion eligibility score
                 selected_patient_row = patient_df[patient_df['Patient Name'] == selected_patient].iloc[0]
                 inclusion_score_numerator = 0
+                inclusion_criteria_count = 0
                 criterion_number = 1
                 for i, criterion in enumerate(parsed_criteria['inclusion'], start=1):
                     if criterion.strip().lower().startswith("registration #"):
@@ -170,10 +171,10 @@ if len(uploaded_files) >= 2 and openai_api_key:
                     criterion_number += 1
                     if eligibility == "Yes":
                         inclusion_score_numerator += 1
+                    inclusion_criteria_count += 1
                 
-                inclusion_score_denominator = len([criterion for criterion in parsed_criteria['inclusion'] if not criterion.strip().lower().startswith("registration #")])
-                if inclusion_score_denominator > 0:
-                    inclusion_score = (inclusion_score_numerator / inclusion_score_denominator) * 100
+                if inclusion_criteria_count > 0:
+                   inclusion_score = (inclusion_score_numerator / inclusion_criteria_count) * 100
                 else:
                     inclusion_score = 0
                 
